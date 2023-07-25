@@ -51,89 +51,89 @@ document.addEventListener('DOMContentLoaded', function () {
 });
 
 //document.addEventListener("DOMContentLoaded", function () {
-  
-  const overlay = document.getElementById('overlay');
-  const overlayImage = document.getElementById('overlayImage');
-  const imageLinks = document.querySelectorAll('.image-link');
-  let currentIndex = 0;
 
-  function showOverlay(index) {
-    const imageUrl = imageLinks[index].getAttribute('data-image-url');
-    console.log(imageUrl);
-    overlayImage.src = imageUrl;
-    currentIndex = index;
-    overlay.style.display = 'flex';
-  }
+const overlay = document.getElementById('overlay');
+const overlayImage = document.getElementById('overlayImage');
+const imageLinks = document.querySelectorAll('.image-link');
+let currentIndex = 0;
 
-
-  function hideOverlay() {
-    overlay.style.display = 'none';
-  }
-
-  function deleteImage() {
-    const imageUrl = document.getElementById("overlayImage").src;
-    fetch(`/delete/${encodeURIComponent(imageUrl)}`, { method: "DELETE" })
-      .then(response => {
-        if (response.ok) {
-          location.reload();
-          }
-         else {
-          console.error("Error deleting image:", response.statusText);
-        }
-      })
-      .catch(error => {
-        console.error("Error deleting image:", error);
-      });
-  }
-
-  const deleteButton = document.getElementById("deleteButton");
-  deleteButton.addEventListener("click", function () {
-    deleteImage();
-  });
-
-  const closeButton = document.getElementById("closeButton");
-  closeButton.addEventListener("click", function () {
-    hideOverlay();
-  });
+function showOverlay(index) {
+  const imageUrl = imageLinks[index].getAttribute('data-image-url');
+  console.log(imageUrl);
+  overlayImage.src = imageUrl;
+  currentIndex = index;
+  overlay.style.display = 'flex';
+}
 
 
+function hideOverlay() {
+  overlay.style.display = 'none';
+}
 
-  // Function to handle forward and backward navigation
-  function changeImage(step) {
-    currentIndex += step;
-
-    // Loop back to the first image if at the end
-    if (currentIndex < 0) {
-      currentIndex = imageLinks.length - 1;
-    } else if (currentIndex >= imageLinks.length) {
-      currentIndex = 0;
-    }
-
-    showOverlay(currentIndex);
-  }
-
-
-  // ... Your existing event listeners ...
-
-  // Show the first image in overlay on page load
-
-
-
-
-  // Add click event listener to each image link
-  imageLinks.forEach(imageLink => {
-    imageLink.addEventListener('click', function (event) {
-      event.preventDefault();
-
-      const imageUrl = this.getAttribute('data-image-url');
-
-      // Set the image source for the overlay
-      overlayImage.src = imageUrl;
-
-      // Show the overlay
-      overlay.style.display = 'flex';
+function deleteImage() {
+  const imageUrl = document.getElementById("overlayImage").src;
+  fetch(`/delete/${encodeURIComponent(imageUrl)}`, { method: "DELETE" })
+    .then(response => {
+      if (response.ok) {
+        location.reload();
+      }
+      else {
+        console.error("Error deleting image:", response.statusText);
+      }
+    })
+    .catch(error => {
+      console.error("Error deleting image:", error);
     });
+}
+
+const deleteButton = document.getElementById("deleteButton");
+deleteButton.addEventListener("click", function () {
+  deleteImage();
+});
+
+const closeButton = document.getElementById("closeButton");
+closeButton.addEventListener("click", function () {
+  hideOverlay();
+});
+
+
+
+// Function to handle forward and backward navigation
+function changeImage(step) {
+  currentIndex += step;
+
+  // Loop back to the first image if at the end
+  if (currentIndex < 0) {
+    currentIndex = imageLinks.length - 1;
+  } else if (currentIndex >= imageLinks.length) {
+    currentIndex = 0;
+  }
+
+  showOverlay(currentIndex);
+}
+
+
+// ... Your existing event listeners ...
+
+// Show the first image in overlay on page load
+
+
+
+
+// Add click event listener to each image link
+imageLinks.forEach(imageLink => {
+  imageLink.addEventListener('click', function (event) {
+    event.preventDefault();
+
+    const imageUrl = this.getAttribute('data-image-url');
+
+    // Set the image source for the overlay
+    overlayImage.src = imageUrl;
+
+    // Show the overlay
+    overlay.style.display = 'flex';
   });
+});
 
 
 document.addEventListener("DOMContentLoaded", function () {
@@ -147,24 +147,28 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.getElementById("fileInput").addEventListener("change", function () {
-
+    const apikey = "A8olZHEwhSBSPApIUMQxIz";
+    const client = filestack.init(apikey);
     const file = this.files[0];
     if (file) {
-      const formData = new FormData();
-      formData.append("image", file);
-
-      const xhr = new XMLHttpRequest();
-      xhr.open("POST", "/upload");
-      xhr.send(formData);
-      xhr.onreadystatechange = function () {
-        if (xhr.readyState === XMLHttpRequest.DONE) {
-          if (xhr.status === 200) {
-            location.reload();
-          } else {
-            console.error("Error uploading file:", xhr.statusText);
+      client.upload(file).then(result => {
+        const fileUrl = result.url;
+        const xhr = new XMLHttpRequest();
+        xhr.open("POST", "/upload");
+        xhr.setRequestHeader("Content-Type", "application/json");
+        xhr.onreadystatechange = function () {
+          if (xhr.readyState === XMLHttpRequest.DONE) {
+            if (xhr.status === 200) {
+              location.reload();
+            } else {
+              console.error("Error uploading file:", xhr.statusText);
+            }
           }
-        }
-      };
+        };
+        xhr.send(JSON.stringify({ fileUrl }));
+      }).catch(error => {
+        console.error('Error uploading file:', error);
+      });
     }
   });
 

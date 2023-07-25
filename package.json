@@ -10,6 +10,7 @@
     "express": "^4.18.2",
     "express-flash": "^0.0.2",
     "express-session": "^1.17.3",
+    "filestack-js": "^3.26.1",
     "method-override": "^3.0.0",
     "mime-types": "^2.1.35",
     "mongodb": "^5.6.0",
@@ -24,7 +25,7 @@
   "main": "index.js",
   "scripts": {
     "start": "node index.js",
-    "build":"npm install",
+    "build": "npm install",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
   "keywords": [],

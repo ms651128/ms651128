@@ -8,19 +8,19 @@ const routes = express.Router();
 const multer = require('multer');
 const mime = require('mime-types');
 const bcrypt = require('bcrypt');
+const filestack = require('filestack-js');
 
-const storage = multer.diskStorage({
+/*const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    cb(null, 'https://drive.google.com/drive/folders/1HE4vLcpp_xX_E0_LWfdf491zFJaEt7-c?usp=drive_link');
+    cb(null, 'public/uploads/');
   },
   filename: function (req, file, cb) {
     const fileName = Date.now() + path.extname(file.originalname);
     cb(null, fileName);
   },
-});
+});*/
 const allowedImageExtensions = ['jpg', 'jpeg', 'png', 'gif'];
 const upload = multer({ 
-  storage:storage,
   fileFilter: function (req, file, cb) {
     const ext = mime.extension(file.mimetype);
     if (allowedImageExtensions.includes(ext)) {
@@ -138,7 +138,7 @@ routes.get('/home', authMiddleware.checkAuthenticated, async (req, res) => {
 
 routes.post('/upload', upload.single('image'), authMiddleware.checkAuthenticated, async (req, res) => {
 
-  if(!req.file){
+  if(!req.body.fileUrl){
     console.error('no file received');
     return res.status(400).send('No file received');
   }
@@ -148,9 +148,10 @@ routes.post('/upload', upload.single('image'), authMiddleware.checkAuthenticated
     console.error('User not found');
     return res.status(404).send('User not found');
   }
-  const image = req.file.path.replace('public\\', '');
+  
   try {
-    user.images.push(image);
+    const fileUrl = req.body.fileUrl;
+    user.images.push(fileUrl);
     await user.save();
   } catch (error) {
     console.error('Error fetching user data:', error);
@@ -160,10 +161,20 @@ routes.post('/upload', upload.single('image'), authMiddleware.checkAuthenticated
 
 })
 
+  const apikey = process.env.FS_API;
+  const client = filestack.init(apikey);
+  const apiSecret = process.env.MY_K;
+
+  function generateFilestackSignature(policy) {
+    const hmac = crypto.createHmac('sha256', apiSecret);
+    hmac.update(policy);
+    return hmac.digest('hex');
+  }
+
 //delete photo
 routes.delete('/delete/:filename', async (req, res) => {
   let { filename } = req.params;
-  
+  console.log(filename);
   // Delete the image reference from the database (if applicable)
   try {
     const user = await User.findById(req.session.userid);
@@ -172,7 +183,6 @@ routes.delete('/delete/:filename', async (req, res) => {
       console.error('User not found');
       return res.status(404).send('User not found');
     }
-    filename = 'uploads\\' + path.basename(filename);
 
     const index = user.images.indexOf(filename);
     if (index !== -1) {
@@ -183,10 +193,14 @@ routes.delete('/delete/:filename', async (req, res) => {
     console.error('Error deleting image reference from the database:', error);
     return res.status(500).send('Internal Server Error');
   }
+  const policy = {
+    call: ['remove'],
+    url: filename, 
+  };
+  const signature = generateFilestackSignature(JSON.stringify(policy));
 
-  const imagePath = path.join(__dirname, '../public/', filename);
   try {
-    await fs.unlink(imagePath);
+    await client.remove(filename,{policy, signature});
   } catch (error) {
     console.error('Error deleting file:', error);
     return res.status(500).send('Internal Server Error');
