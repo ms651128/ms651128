@@ -9,6 +9,7 @@ const multer = require('multer');
 const mime = require('mime-types');
 const bcrypt = require('bcrypt');
 const filestack = require('filestack-js');
+const crypto = require('crypto');
 
 /*const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -171,6 +172,8 @@ routes.post('/upload', upload.single('image'), authMiddleware.checkAuthenticated
     return hmac.digest('hex');
   }
 
+
+
 //delete photo
 routes.delete('/delete/:filename', async (req, res) => {
   let { filename } = req.params;
@@ -208,6 +211,18 @@ routes.delete('/delete/:filename', async (req, res) => {
 
   res.sendStatus(200);
 });
+
+routes.get('/filestack-policy', (req, res) => {
+  
+  const {filename} = req.params;
+  const policy = {
+    call: ['remove'],
+    url: filename, 
+  };
+  const signature = generateFilestackSignature(JSON.stringify(policy));
+  res.json({ policy, signature });
+});
+
 
 
 // profile
