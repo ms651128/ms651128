@@ -84,13 +84,19 @@ async function deleteImage(filename) {
     await client.remove(filename, { policy, signature });
 
     // Send a request to your delete API to remove the image reference from the database
-    await fetch(`/delete/${encodeURIComponent(filename)}`, { method: 'DELETE' });
+    const deleteResponse =  await fetch(`/delete/${encodeURIComponent(filename)}`, { method: 'DELETE' });
 
-    // Image deleted successfully
+    if(deleteResponse.ok)
+    {
+      // Image deleted successfully
     console.log('Image deleted:', filename);
 
     // Reload the page to reflect the changes
     location.reload();
+    } else{
+      console.error('Error deleting image:', deleteResponse.statusText);
+    }
+    
   } catch (error) {
     console.error('Error deleting image:', error);
   }
