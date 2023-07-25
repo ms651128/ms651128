@@ -11,9 +11,7 @@ const bcrypt = require('bcrypt');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
-    const uploadDir = 'public/uploads/';
-    fs.mkdirSync(uploadDir, { recursive: true });
-    cb(null, 'public/uploads/');
+    cb(null, 'https://drive.google.com/drive/folders/1HE4vLcpp_xX_E0_LWfdf491zFJaEt7-c?usp=drive_link');
   },
   filename: function (req, file, cb) {
     const fileName = Date.now() + path.extname(file.originalname);
