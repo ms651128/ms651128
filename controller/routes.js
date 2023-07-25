@@ -11,6 +11,8 @@ const bcrypt = require('bcrypt');
 
 const storage = multer.diskStorage({
   destination: function (req, file, cb) {
+    const uploadDir = 'public/uploads/';
+    fs.mkdirSync(uploadDir, { recursive: true });
     cb(null, 'public/uploads/');
   },
   filename: function (req, file, cb) {
