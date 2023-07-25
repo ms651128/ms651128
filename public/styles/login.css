@@ -1,0 +1,156 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    color: white;
+  }
+  
+  html,
+  body {
+    height: 100%;
+    background-image: url("/bg.png");
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+  
+  #a{
+    color: whitesmoke;
+    text-decoration: none;
+    transition: .3s;
+    font-weight: 600;
+  }
+  #main {
+    display: flex;
+    height: 100%;
+    z-index: -9999;
+  }
+
+  #logoimg{
+
+    width: 50%;
+    height: 50%;
+
+  }
+  
+  #right_side {
+
+    width: 100%;
+    min-height: 100%;
+    display: flex;
+    justify-content: center;
+    text-align: center;
+    align-items: center;
+  
+  }
+
+#title{
+    font-weight:bolder;
+    font-size: 35px;
+    margin-bottom: 20px;
+}
+#email
+{
+    display: block;
+    margin-bottom: 10px;
+    color: black;
+    font-weight: 500;
+}
+#password
+ {
+    display:block;
+    margin-bottom: 10px;
+ } 
+.label{
+  display: block;
+  margin-bottom: 10px;
+  font-weight: bold;
+}
+.ti
+{
+  width: 100%;
+  padding: 8px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
+  box-sizing: border-box;
+  margin-bottom: 15px;
+  outline: none;
+  transition: 1s;
+  color: black;
+  font-weight: 500;
+}
+.ti:focus{
+    border-color: #700142;
+    color: black;
+}
+
+.btn{
+  padding: 20px;
+  border: none;
+  border-top: #700142 solid 2px;
+  background-color: transparent;
+  color: white;
+  cursor: pointer;
+  width: 250px;
+  font-size: 15px;
+  font-weight: 700;
+  margin-top: 15px;
+  margin-bottom: 15px;
+  transition: 1s;
+  position: relative;
+  overflow: hidden;
+  z-index: 1;
+}
+#a:hover{
+  color: #700142;
+}
+
+span{
+  background-color: #700142;
+  height: 3%;
+  width: 100%;
+  position: absolute;
+  left: 0;
+  bottom: 0; 
+  transition: 0.2s;
+  z-index: -1;
+}
+.btn:hover span{
+  height: 100%;
+}
+
+.form
+{
+    width: auto;
+    height: 380px;  
+}
+.err{
+    width: 250px;
+    margin-top: 10px;
+    color:whitesmoke;
+    font-weight: 700;
+    font-size: 18px;
+}
+.success-message{
+    margin-top: 10px;
+    color:whitesmoke;
+    font-weight: 700;
+    font-size: 17px;
+}
+@media screen and (max-width : 900px) {
+
+  .btn{
+    border: #b1086a 2px solid;
+    border-radius: 25px;
+    background-color: #b1086a;
+    width: 280px;
+  }
+  span{
+    background-color: #b1086a;
+    height: 100%;
+  }
+
+  .form{
+    padding-bottom: 40px;
+  }
+}
