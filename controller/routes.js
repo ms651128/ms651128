@@ -266,8 +266,7 @@ routes.delete('/delete/:filename', async (req, res) => {
     const file = "https://cdn.filestackcontent.com/"+filename.replace('%22','');
     // Find the image URL in the user's images array
     const imageUrl = user.images.find((image) => image.includes(file));
-    console.log(file);
-    console.log(imageUrl);
+
     const file2 = filename.replace('%22','');
     if (!imageUrl) {
       console.error('Image URL not found');
