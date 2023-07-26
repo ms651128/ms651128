@@ -59,7 +59,6 @@ let currentIndex = 0;
 
 function showOverlay(index) {
   const imageUrl = imageLinks[index].getAttribute('data-image-url');
-  console.log(imageUrl);
   overlayImage.src = imageUrl;
   currentIndex = index;
   overlay.style.display = 'flex';
@@ -74,7 +73,6 @@ async function deleteImage() {
 
   const imageUrl = document.getElementById('overlayImage').src;
   let imageHandle = imageUrl.split('/').pop(); // Extract the image handle from the URL
-  console.log(imageHandle);
   try {
     const response = await fetch(`/delete/${encodeURIComponent(imageHandle)}`, {
       method: "DELETE",
