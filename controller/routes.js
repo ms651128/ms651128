@@ -228,7 +228,7 @@ routes.get('/getUploadSignature', async (req, res) => {
   const policyB64 = Buffer.from(JSON.stringify(policy)).toString('base64');
   const signature = crypto.createHmac('sha256', process.env.MY_K).update(policyB64).digest('hex');
 
-  res.json({ policy: policyB64, signature });
+  res.json({ policy: policyB64, signature : signature });
 });
   
 
