@@ -70,41 +70,26 @@ function hideOverlay() {
   overlay.style.display = 'none';
 }
 
-async function deleteImage(filename) {
+async function deleteImage() {
+
+  const imageUrl = document.getElementById('overlayImage').src;
+  let imageHandle = imageUrl.split('/').pop(); // Extract the image handle from the URL
+  console.log(imageHandle);
   try {
-    // Fetch the security policy and signature from the server
-    const response = await fetch('/filestack-policy');
-    const { policy, signature } = await response.json();
-
-    // Initialize Filestack client
-    const apiKey = "A8olZHEwhSBSPApIUMQxIz";
-    const client = filestack.init(apiKey);
-
-    // Delete the image from Filestack's storage using policy and signature
-    await client.remove(filename, { policy, signature });
-
-    // Send a request to your delete API to remove the image reference from the database
-    const deleteResponse =  await fetch(`/delete/${encodeURIComponent(filename)}`, { method: 'DELETE' });
-
-    if(deleteResponse.ok)
-    {
-      // Image deleted successfully
-    console.log('Image deleted:', filename);
-
-    // Reload the page to reflect the changes
-    location.reload();
-    } else{
-      console.error('Error deleting image:', deleteResponse.statusText);
+    const response = await fetch(`/delete/${encodeURIComponent(imageHandle)}`, {
+      method: "DELETE",
+    });
+    if (response.ok) {
+      location.reload();
+    } else {
+      console.error("Error deleting image:", response.statusText);
     }
-    
   } catch (error) {
-    console.error('Error deleting image:', error);
+    console.error("Error deleting image:", error);
   }
 }
 
-// Example usage:
-const imageUrl = document.getElementById('overlayImage').src;
-deleteImage(imageUrl);
+
 
 const deleteButton = document.getElementById("deleteButton");
 deleteButton.addEventListener("click", function () {

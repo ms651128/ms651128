@@ -10,6 +10,7 @@ const mime = require('mime-types');
 const bcrypt = require('bcrypt');
 const filestack = require('filestack-js');
 const crypto = require('crypto');
+const axios = require('axios');
 
 /*const storage = multer.diskStorage({
   destination: function (req, file, cb) {
@@ -162,66 +163,74 @@ routes.post('/upload', upload.single('image'), authMiddleware.checkAuthenticated
 
 })
 
-  const apikey = process.env.FS_API;
-  const client = filestack.init(apikey);
-  const apiSecret = process.env.MY_K;
-
-  function generateFilestackSignature(policy) {
-    const hmac = crypto.createHmac('sha256', apiSecret);
-    hmac.update(policy);
-    return hmac.digest('hex');
-  }
+  
 
 
 
 //delete photo
 routes.delete('/delete/:filename', async (req, res) => {
-  let { filename } = req.params;
-  console.log(filename);
-  // Delete the image reference from the database (if applicable)
+  const { filename } = req.params;
+  const apiSecret = process.env.MY_K;
+
+  function generatePolicyAndSignature() {
+    const now = Math.floor(Date.now() / 1000);
+    const expiry = now + 60 * 5; // 5 minutes expiration time
+  
+    const policy = {
+      call: ['remove'],
+      expiry,
+    };
+  
+    const policyB64 = Buffer.from(JSON.stringify(policy)).toString('base64');
+    const signature = crypto.createHmac('sha256', apiSecret).update(policyB64).digest('hex');
+  
+    return {
+      policy: policyB64,
+      signature,
+    };
+  }
   try {
+    // Get the user from the database
     const user = await User.findById(req.session.userid);
-    
     if (!user) {
       console.error('User not found');
       return res.status(404).send('User not found');
     }
 
-    const index = user.images.indexOf(filename);
-    if (index !== -1) {
-      user.images.splice(index, 1);
-      await user.save();
+
+    // Find the image URL in the user's images array
+    const imageUrl = user.images.find((image) => image.includes(filename));
+    if (!imageUrl) {
+      console.error('Image URL not found');
+      return res.status(404).send('Image URL not found');
     }
+
+    const { policy, signature } = generatePolicyAndSignature();
+    
+    const apikey = process.env.FS_API;
+    const deleteUrl = `https://www.filestackapi.com/api/file/${filename}?key=${apikey}&policy=${policy}&signature=${signature}`;
+
+    // Send a DELETE request to the delete URL using Axios
+    const response = await axios.delete(deleteUrl);
+
+    // Check if the deletion was successful
+    if (response.status === 200) {
+      
+    user.images = user.images.filter((image) => !image.includes(filename));
+    await user.save();
+
+      return res.sendStatus(200);
+    } else {
+      return res.status(response.status).send(response.statusText);
+    }
+
+
   } catch (error) {
-    console.error('Error deleting image reference from the database:', error);
+    console.error('Error deleting image:', error);
     return res.status(500).send('Internal Server Error');
   }
-  const policy = {
-    call: ['remove'],
-    url: filename, 
-  };
-  const signature = generateFilestackSignature(JSON.stringify(policy));
-
-  try {
-    await client.remove(filename,{policy, signature});
-  } catch (error) {
-    console.error('Error deleting file:', error);
-    return res.status(500).send('Internal Server Error');
-  }
-
-  res.sendStatus(200);
 });
 
-routes.get('/filestack-policy', (req, res) => {
-  
-  const {filename} = req.params;
-  const policy = {
-    call: ['remove'],
-    url: filename, 
-  };
-  const signature = generateFilestackSignature(JSON.stringify(policy));
-  res.json({ policy, signature });
-});
 
 
 
