@@ -138,30 +138,30 @@ routes.get('/home', authMiddleware.checkAuthenticated, async (req, res) => {
   }
 });
 
-routes.post('/upload', upload.single('image'), authMiddleware.checkAuthenticated, async (req, res) => {
-
-  if(!req.body.fileUrl){
-    console.error('no file received');
-    return res.status(400).send('No file received');
+routes.post('/upload',upload.single('image'),authMiddleware.checkAuthenticated, async (req, res) => {
+  if (!req.body.fileUrl) {
+    console.error('No file URL received');
+    return res.status(400).send('No file URL received');
   }
-  
+
   const user = await User.findById(req.session.userid);
   if (!user) {
     console.error('User not found');
     return res.status(404).send('User not found');
   }
-  
+
   try {
     const fileUrl = req.body.fileUrl;
     user.images.push(fileUrl);
     await user.save();
+    console.log('File URL added to user images successfully:');
   } catch (error) {
-    console.error('Error fetching user data:', error);
-    res.status(500).send('Internal Server Error');
+    console.error('Error updating user data:', error);
+    return res.status(500).send('Internal Server Error');
   }
-  res.redirect('/home');
 
-})
+  return res.status(200).send('File URL added successfully');
+});
 
   
 

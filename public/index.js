@@ -5,7 +5,6 @@ document.addEventListener('DOMContentLoaded', function () {
     event.preventDefault();
     const target = document.querySelector(event.target.getAttribute('data-target'));
     const offsetTop = target.getBoundingClientRect().top;
-    const navbarHeight = document.getElementById('navbar').offsetHeight;
     const totalOffset = offsetTop + window.scrollY;
 
     window.scrollTo({
@@ -152,29 +151,33 @@ document.addEventListener("DOMContentLoaded", function () {
   document.getElementById("fileInput").addEventListener("change", function () {
     const apikey = "A8olZHEwhSBSPApIUMQxIz";
     const client = filestack.init(apikey);
+    
     const file = this.files[0];
-    if (file) {
-      client.upload(file).then(result => {
-        const fileUrl = result.url;
-        const xhr = new XMLHttpRequest();
-        xhr.open("POST", "/upload");
-        xhr.setRequestHeader("Content-Type", "application/json");
-        xhr.onreadystatechange = function () {
-          if (xhr.readyState === XMLHttpRequest.DONE) {
-            if (xhr.status === 200) {
-              location.reload();
-            } else {
-              console.error("Error uploading file:", xhr.statusText);
+    
+    {
+      client.upload(file)
+        .then(result => {
+          const fileUrl = result.url; // Filestack URL for the uploaded file
+          console.log(fileUrl);
+          // Send the fileUrl to the backend using XMLHttpRequest
+          const xhr = new XMLHttpRequest();
+          xhr.open("POST", "/upload");
+          xhr.setRequestHeader("Content-Type", "application/json");
+          xhr.onreadystatechange = function () {
+            if (xhr.readyState === XMLHttpRequest.DONE) {
+              if (xhr.status === 200) {
+          
+                location.reload(); // Reload the page after successful upload (you may adjust this based on your requirements)
+              } else {
+                console.error('Error sending file URL to backend:', xhr.statusText);
+              }
             }
-          }
-        };
-        xhr.send(JSON.stringify({ fileUrl }));
-      }).catch(error => {
-        console.error('Error uploading file:', error);
-      });
+          };
+          xhr.send(JSON.stringify({ fileUrl })); // Send the fileUrl in the request body
+        })
+        .catch(error => {
+          console.error('Error uploading file:', error);
+        });
     }
   });
-
 });
-
-
