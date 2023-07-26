@@ -126,10 +126,60 @@ routes.delete('/logout', (req, res) => {
 });
 
 // Home Page
-routes.get('/home', authMiddleware.checkAuthenticated, async (req, res) => {
+/*routes.get('/home', authMiddleware.checkAuthenticated, async (req, res) => {
 
   try {
     const loggedInUser = await User.findById(req.session.userid);
+    res.render('newhome', { User: loggedInUser });
+
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).send('Internal Server Error');
+  }
+});*/
+
+
+routes.get('/home', authMiddleware.checkAuthenticated, async (req, res) => {
+  function generatePolicyAndSignature(handle) {
+    const now = Math.floor(Date.now() / 1000);
+    const expiry = now + 60 * 5; // 5 minutes expiration time
+  
+    const policy = {
+      call: ['read'],
+      expiry,
+    };
+  
+    const policyB64 = Buffer.from(JSON.stringify(policy)).toString('base64');
+    const signature = crypto.createHmac('sha256', process.env.MY_K).update(policyB64).digest('hex');
+  
+    return {
+      policy: policyB64,
+      signature,
+    };
+  }
+  
+  
+  try {
+    const loggedInUser = await User.findById(req.session.userid);
+
+    // Add policy and signature to each image URL in user.images array
+    const apiKey = process.env.FS_API;
+    const client = filestack.init(apiKey);
+
+    loggedInUser.images = await Promise.all(loggedInUser.images.map(async (image) => {
+      const { policy, signature } = generatePolicyAndSignature(); // Implement generatePolicyAndSignature function
+
+      // Create the Filestack URL with the policy and signature
+      const imageWithPolicyAndSignature = client.transform(image, {
+        security: {
+          policy,
+          signature,
+        },
+      });
+
+      return imageWithPolicyAndSignature;
+    }));
+
     res.render('newhome', { User: loggedInUser });
 
   } catch (error) {
@@ -163,14 +213,30 @@ routes.post('/upload',upload.single('image'),authMiddleware.checkAuthenticated, 
   return res.status(200).send('File URL added successfully');
 });
 
+
+routes.get('/getUploadSignature', async (req, res) => {
+  
+  // Generate the policy and signature
+  const now = Math.floor(Date.now() / 1000);
+  const expiry = now + 60 * 5; // 5 minutes expiration time
+
+  const policy = {
+    call: ['pick', 'read', 'store', 'convert', 'remove'],
+    expiry,
+  };
+
+  const policyB64 = Buffer.from(JSON.stringify(policy)).toString('base64');
+  const signature = crypto.createHmac('sha256', process.env.MY_K).update(policyB64).digest('hex');
+
+  res.json({ policy: policyB64, signature });
+});
   
 
 
 
 //delete photo
 routes.delete('/delete/:filename', async (req, res) => {
-  const { filename } = req.params;
-  const apiSecret = process.env.MY_K;
+  let { filename } =  req.params;
 
   function generatePolicyAndSignature() {
     const now = Math.floor(Date.now() / 1000);
@@ -182,7 +248,7 @@ routes.delete('/delete/:filename', async (req, res) => {
     };
   
     const policyB64 = Buffer.from(JSON.stringify(policy)).toString('base64');
-    const signature = crypto.createHmac('sha256', apiSecret).update(policyB64).digest('hex');
+    const signature = crypto.createHmac('sha256', process.env.MY_K).update(policyB64).digest('hex');
   
     return {
       policy: policyB64,
@@ -197,18 +263,20 @@ routes.delete('/delete/:filename', async (req, res) => {
       return res.status(404).send('User not found');
     }
 
-
+    const file = "https://cdn.filestackcontent.com/"+filename.replace('%22','');
     // Find the image URL in the user's images array
-    const imageUrl = user.images.find((image) => image.includes(filename));
+    const imageUrl = user.images.find((image) => image.includes(file));
+    console.log(file);
+    console.log(imageUrl);
+    const file2 = filename.replace('%22','');
     if (!imageUrl) {
       console.error('Image URL not found');
       return res.status(404).send('Image URL not found');
     }
 
     const { policy, signature } = generatePolicyAndSignature();
-    
     const apikey = process.env.FS_API;
-    const deleteUrl = `https://www.filestackapi.com/api/file/${filename}?key=${apikey}&policy=${policy}&signature=${signature}`;
+    const deleteUrl = `https://www.filestackapi.com/api/file/${file2}?key=${apikey}&policy=${policy}&signature=${signature}`;
 
     // Send a DELETE request to the delete URL using Axios
     const response = await axios.delete(deleteUrl);
@@ -216,7 +284,7 @@ routes.delete('/delete/:filename', async (req, res) => {
     // Check if the deletion was successful
     if (response.status === 200) {
       
-    user.images = user.images.filter((image) => !image.includes(filename));
+    user.images = user.images.filter((image) => !image.includes(file));
     await user.save();
 
       return res.sendStatus(200);

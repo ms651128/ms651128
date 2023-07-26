@@ -149,34 +149,64 @@ document.addEventListener("DOMContentLoaded", function () {
   });
 
   document.getElementById("fileInput").addEventListener("change", function () {
-    const apikey = "A8olZHEwhSBSPApIUMQxIz";
-    const client = filestack.init(apikey);
-    
     const file = this.files[0];
-    
-    {
-      client.upload(file)
-        .then(result => {
-          const fileUrl = result.url; // Filestack URL for the uploaded file
-          console.log(fileUrl);
-          // Send the fileUrl to the backend using XMLHttpRequest
-          const xhr = new XMLHttpRequest();
-          xhr.open("POST", "/upload");
-          xhr.setRequestHeader("Content-Type", "application/json");
-          xhr.onreadystatechange = function () {
-            if (xhr.readyState === XMLHttpRequest.DONE) {
-              if (xhr.status === 200) {
-          
-                location.reload(); // Reload the page after successful upload (you may adjust this based on your requirements)
-              } else {
-                console.error('Error sending file URL to backend:', xhr.statusText);
+  
+    // Check if a file is selected
+    if (file) {
+      // Fetch the policy and signature from the backend
+      fetch("/getUploadSignature")
+        .then(response => response.json())
+        .then(data => {
+          // Check if the response contains the policy and signature
+          if (!data.policy || !data.signature) {
+            throw new Error('Policy or signature not received from the server.');
+          }
+  
+          // Upload the file to Filestack using fetch API
+          fetch(`https://www.filestackapi.com/api/store/S3?key=A8olZHEwhSBSPApIUMQxIz&policy=${data.policy}&signature=${data.signature}`, {
+            method: "POST",
+            body: file
+          })
+            .then(response => {
+              // Check if the response has an error status code
+              if (!response.ok) {
+                throw new Error('File upload failed: ' + response.statusText);
               }
-            }
-          };
-          xhr.send(JSON.stringify({ fileUrl })); // Send the fileUrl in the request body
+              // Parse the response JSON
+              return response.json();
+            })
+            .then(data => {
+             
+  
+              
+              if (data && data.url) {
+                // Construct the file URL based on the response data
+                const fileUrl = data.url;
+  
+                // Send the fileUrl to the backend using XMLHttpRequest
+                const xhr = new XMLHttpRequest();
+                xhr.open("POST", "/upload");
+                xhr.setRequestHeader("Content-Type", "application/json");
+                xhr.onreadystatechange = function () {
+                  if (xhr.readyState === XMLHttpRequest.DONE) {
+                    if (xhr.status === 200) {
+                       location.reload(); // Reload the page after successful upload (you may adjust this based on your requirements)
+                    } else {
+                      console.error('Error sending file URL to backend:', xhr.statusText);
+                    }
+                  }
+                };
+                xhr.send(JSON.stringify({ fileUrl })); // Send the fileUrl in the request body
+              } else {
+                console.error('File upload failed: Handle property not found in the response.');
+              }
+            })
+            .catch(error => {
+              console.error('Error uploading file:', error);
+            });
         })
         .catch(error => {
-          console.error('Error uploading file:', error);
+          console.error('Error fetching policy and signature:', error);
         });
     }
   });
