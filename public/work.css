@@ -1,0 +1,112 @@
+* {
+    margin: 0;
+    padding: 0;
+    font-family: 'Poppins', sans-serif;
+    color: black;
+    scroll-margin: thin;
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background-image: linear-gradient(to bottom, #FFFFFF, #4070f481);
+  background-attachment: fixed;
+}
+
+::-webkit-scrollbar {
+  width: 5px;
+  background-color: black;
+}
+
+::-webkit-scrollbar-thumb {
+  background-color: #4070f4;
+  border-radius: 4px;
+}
+
+.card {
+    margin: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(245, 245, 245, 0.678);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+    box-sizing: border-box;
+}
+@media screen and (max-width:768px) {
+  .card {
+    display: inline-block;
+    margin: 20px;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(245, 245, 245, 0.678);
+    box-shadow: 0 0 10px rgba(0, 0, 0, 0.8);
+}
+.desc{
+  border-top: gray solid 1px;
+  border-bottom: gray solid 1px;
+  height: auto;
+  text-align: center;
+  box-sizing: border-box; 
+  word-wrap: break-word;
+}
+}
+
+.img-con{
+    
+    width: 100%;
+    height: auto;
+    padding: 20px;
+    text-align: center;
+    box-sizing: border-box;
+}
+.desc{
+    border-left: gray solid 1px;
+    border-right: gray solid 1px;
+    width: 100%;
+    height: auto;
+    padding: 30px;
+    text-align: center;
+    box-sizing: border-box;
+}
+.form{
+   
+    width: 100%;
+    height: auto;
+    padding: 20px;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+.btn {
+    padding: 20px;
+    border: none;
+    border-top: #4070f4 solid 2px;
+    background-color: transparent;
+    cursor: pointer;
+    width: 250px;
+    font-size: 15px;
+    font-weight: 700;
+    margin-top: 15px;
+    margin-bottom: 15px;
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+  }
+  spann {
+    background-color: #4070f4;
+    height: 3%;
+    width: 100%;
+    position: absolute;
+    left: 0;
+    bottom: 0;
+    transition: height 0.2s;
+    z-index: -1;
+  }
+  .btn:hover spann {
+    height: 100%;
+  }
+  
+  .btn:hover {
+    color: white;
+  }

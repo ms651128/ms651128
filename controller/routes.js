@@ -35,6 +35,11 @@ const upload = multer({
 const User = user_model.users;
 
 
+//work
+routes.get('/work', async (req, res) => {
+  res.render('work');
+});
+
 // Rendering first page
 routes.get('/', async (req, res) => {
   res.render('index');
@@ -120,7 +125,7 @@ routes.post('/login', authMiddleware.checkNotAuthenticated, (req, res, next) => 
 routes.delete('/logout', (req, res) => {
   req.logOut(() => {
     req.flash('success', 'Logged Out Successfully');
-    res.redirect('/')
+    res.redirect('/login')
   })
 
 });

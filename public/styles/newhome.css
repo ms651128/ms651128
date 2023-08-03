@@ -12,6 +12,8 @@ body {
   height: 100vh;
   margin: 0;
   padding: 0;
+  background-image: linear-gradient(to bottom, #FFFFFF, #3d0ab4);
+  background-attachment: fixed;
 }
 
 ::-webkit-scrollbar {
@@ -20,7 +22,7 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: #700142;
+  background-color: #3d0ab4;
   border-radius: 4px;
 }
 
@@ -61,7 +63,8 @@ body {
   border-radius: 25px;
   overflow: hidden;
 }
-.image{
+
+.image {
   width: 100%;
   height: 100%;
 }
@@ -113,7 +116,8 @@ body {
   border: none;
   outline: none;
 }
-.firstupload{
+
+.firstupload {
   border-radius: 25px;
   width: 50%;
   height: 86vh;
@@ -122,51 +126,54 @@ body {
   align-items: center;
   justify-content: center;
 }
-.fbtn{
-  border: rgb(37, 37, 37) solid 5px;
+
+.fbtn {
+  border: #3d0ab4 solid 1px;
   width: 80%;
   border-radius: 25px;
   display: grid;
   text-align: center;
   align-items: center;
   justify-content: center;
-  padding:0;
+  padding: 0;
 }
-.fu{
+
+.fu {
   background-color: transparent;
   width: 80px;
   height: 80px;
   border-radius: 50px;
   border: none;
-  background-color: rgb(37, 37, 37);
+  background-color: #3d0ab4
 }
 
 
-#dtl{
-  
+#dtl {
+
   position: relative;
   width: 100vw;
   height: 100vh;
-  z-index: -1;
+  margin-top: 80px;
 }
-.profile{
+
+.profile {
   position: absolute;
-  top: 50%;
+  top: 40%;
   left: 50%;
   transform: translate(-50%, -50%);
   font-size: 20px;
 }
 
 @media screen and (max-width: 768px) {
-  
-  .profile{
+
+  .profile {
     position: absolute;
-    top: 50%;
-    left: 50%;
+    top: 45%;
+    left: 55%;
     transform: translate(-50%, -50%);
   }
 
-  .firstupload{
+  .firstupload {
     border-radius: 25px;
     width: 100%;
     height: 86vh;
@@ -174,34 +181,35 @@ body {
     text-align: center;
     align-items: center;
     justify-content: center;
-    
+
   }
-  .fbtn{
-    border: rgb(37, 37, 37) solid 5px;
+
+  .fbtn {
+    border: #3d0ab4 solid 5px;
     width: 100%;
     border-radius: 25px;
     display: grid;
     text-align: center;
     align-items: center;
     justify-content: center;
-    margin: 0;  
+    margin: 0;
     padding: 0;
   }
-  
-  
-  
+
+
+
   .mid-navv a {
     margin-right: 10px;
 
   }
 
   .image-box {
-  width: 346px;
-  margin-right: 40px;
-  margin-bottom: 50px;
-  height: 300px;
-  border-radius: 25px;
-  overflow: hidden;
+    width: 346px;
+    margin-right: 40px;
+    margin-bottom: 50px;
+    height: 300px;
+    border-radius: 25px;
+    overflow: hidden;
   }
 
   .img-list {

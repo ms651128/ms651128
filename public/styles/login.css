@@ -8,7 +8,8 @@
   html,
   body {
     height: 100%;
-    background-image: url("/bg.png");
+    background-image: linear-gradient(to bottom, #FFFFFF, #3d0ab4);
+    background-attachment: fixed;
     background-size: cover;
     background-position: center;
     background-repeat: no-repeat;
@@ -80,14 +81,14 @@
   font-weight: 500;
 }
 .ti:focus{
-    border-color: #700142;
+    border-color: #3d0ab4;
     color: black;
 }
 
 .btn{
   padding: 20px;
   border: none;
-  border-top: #700142 solid 2px;
+  border-top: #3d0ab4 solid 2px;
   background-color: transparent;
   color: white;
   cursor: pointer;
@@ -102,11 +103,11 @@
   z-index: 1;
 }
 #a:hover{
-  color: #700142;
+  color: #3d0ab4;
 }
 
 span{
-  background-color: #700142;
+  background-color: #3d0ab4;
   height: 3%;
   width: 100%;
   position: absolute;
@@ -140,13 +141,13 @@ span{
 @media screen and (max-width : 900px) {
 
   .btn{
-    border: #b1086a 2px solid;
+    border: #3d0ab4 2px solid;
     border-radius: 25px;
-    background-color: #b1086a;
+    background-color: #3d0ab4;
     width: 280px;
   }
   span{
-    background-color: #b1086a;
+    background-color: #3d0ab4;
     height: 100%;
   }
 

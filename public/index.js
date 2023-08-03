@@ -157,6 +157,7 @@ document.addEventListener("DOMContentLoaded", function () {
       fetch("/getUploadSignature")
         .then(response => response.json())
         .then(data => {
+          console.log(data);
           // Check if the response contains the policy and signature
           if (!data.policy || !data.signature) {
             throw new Error('Policy or signature not received from the server.');
@@ -176,9 +177,6 @@ document.addEventListener("DOMContentLoaded", function () {
               return response.json();
             })
             .then(data => {
-             
-  
-              
               if (data && data.url) {
                 // Construct the file URL based on the response data
                 const fileUrl = data.url;
